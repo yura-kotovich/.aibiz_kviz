@@ -4,40 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI-Аудит Рутини | Quiz</title>
-    <!-- Підключаємо офіційний SDK Телеграм Веб-додатків -->
+    <!-- Підключення Telegram WebApp API -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --tg-bg-color: #17212b;       /* Темний фон чату */
-            --tg-header-bg: #242f3d;      /* Фон хенера */
-            --tg-text-color: #ffffff;     /* Основний текст */
-            --tg-secondary-text: #7f91a4; /* Сірий текст */
-            --tg-msg-in: #182533;         /* Повідомлення бота (темна тема) */
-            --tg-msg-out: #2b5278;        /* Повідомлення користувача */
-            --tg-link-btn: #8774e1;       /* Кольорова кнопка */
+            --tg-bg-color: #17212b;
+            --tg-header-bg: #242f3d;
+            --tg-text-color: #ffffff;
+            --tg-secondary-text: #7f91a4;
+            --tg-msg-in: #182533;
+            --tg-msg-out: #2b5278;
+            --tg-link-btn: #8774e1;
             --tg-btn-text: #ffffff;
             --input-bg: #242f3d;
-            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #0e1621; 
+            background-color: #0e1621;
             font-family: var(--font-family);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: var(--tg-text-color);
-            overflow: hidden;
         }
 
-        /* Контейнер мобільного Телеграм */
         .app-container {
             width: 100%;
             max-width: 480px;
@@ -46,7 +39,6 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
         }
 
         @media (min-width: 500px) {
@@ -54,103 +46,46 @@
                 height: 90vh;
                 border-radius: 16px;
                 overflow: hidden;
-                border: 1px solid #242f3d;
+                border: 1px solid #0e1621;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.5);
             }
         }
 
-        /* Хедер */
         .header {
             background-color: var(--tg-header-bg);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #121922;
-            z-index: 10;
-        }
-
-        .header-left {
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
+            border-bottom: 2px solid #0e1621;
         }
 
         .header-avatar {
             width: 38px;
             height: 38px;
-            background-color: var(--tg-link-btn);
+            background-color: #8774e1;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 16px;
-            color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .header-info {
-            display: flex;
-            flex-direction: column;
-        }
+        .header-info { display: flex; flex-direction: column; }
+        .header-name { font-weight: 600; font-size: 15px; }
+        .header-status { font-size: 11px; color: #4fc3f7; }
 
-        .header-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .header-status {
-            font-size: 11px;
-            color: var(--tg-secondary-text);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: #2ec4b6;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .badge-mode {
-            font-size: 10px;
-            background-color: #121922;
-            padding: 3px 8px;
-            border-radius: 6px;
-            color: var(--tg-secondary-text);
-            font-family: monospace;
-        }
-
-        /* Чат */
         .chat-area {
             flex: 1;
-            padding: 20px 14px;
+            padding: 20px 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             scroll-behavior: smooth;
         }
 
-        /* Дата розмежувальник */
-        .date-divider {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .date-label {
-            background-color: rgba(36, 47, 61, 0.6);
-            color: #a5b5c1;
-            font-size: 11px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        /* Бульбашки повідомлень */
         .message {
             max-width: 85%;
             padding: 10px 14px;
@@ -159,10 +94,10 @@
             line-height: 1.45;
             position: relative;
             word-wrap: break-word;
-            animation: slideUp 0.25s ease-out;
+            animation: fadeIn 0.25s ease;
         }
 
-        @keyframes slideUp {
+        @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -171,95 +106,73 @@
             align-self: flex-start;
             background-color: var(--tg-msg-in);
             border-bottom-left-radius: 4px;
-            color: #f5f7fa;
         }
 
         .message.user {
             align-self: flex-end;
             background-color: var(--tg-msg-out);
             border-bottom-right-radius: 4px;
-            color: #ffffff;
         }
 
         .message-time {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 4px;
+            display: block;
+            text-align: right;
             font-size: 9px;
             color: rgba(255,255,255,0.4);
-            margin-top: 5px;
-            user-select: none;
+            margin-top: 4px;
         }
 
-        /* Секція керування та вибору відповідей */
         .controls-area {
             background-color: var(--tg-header-bg);
             padding: 12px;
-            border-top: 1px solid #121922;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            min-height: 70px;
-        }
-
-        .options-grid {
+            border-top: 1px solid #0e1621;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
+        .options-grid { display: grid; gap: 8px; }
+
         .option-btn {
-            background-color: var(--tg-bg-color);
+            background: #17212b;
             border: 1px solid rgba(135, 116, 225, 0.2);
-            color: #55aaff;
-            padding: 12px 16px;
-            border-radius: 12px;
+            color: #4fc3f7;
+            padding: 12.5px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: left;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             transition: all 0.15s;
         }
 
         .option-btn:hover {
-            background-color: rgba(135,116,225,0.1);
-            border-color: var(--tg-link-btn);
+            background: rgba(135, 116, 225, 0.15);
             color: #fff;
+            border-color: var(--tg-link-btn);
         }
 
-        .option-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Текстовий інпут */
-        .input-group {
-            display: flex;
-            gap: 8px;
-            background-color: var(--tg-bg-color);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
+        .input-group { display: flex; gap: 8px; }
 
         .text-input {
             flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px 12px;
+            background-color: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
             color: white;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 13.5px;
             outline: none;
+            transition: border 0.2s;
         }
 
+        .text-input:focus { border-color: var(--tg-link-btn); }
+
         .send-btn {
-            width: 38px;
-            height: 38px;
+            width: 44px;
+            height: 44px;
             background-color: var(--tg-link-btn);
             border: none;
             border-radius: 50%;
@@ -268,32 +181,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.15s;
         }
 
-        .send-btn:hover {
-            opacity: 0.95;
-        }
-
-        /* Спеціальна контактна форма для звичайного Веб-браузера */
-        .contact-card {
-            background-color: var(--tg-bg-color);
-            border: 1px solid rgba(255,255,255,0.1);
+        .form-container {
+            background-color: #17212b;
+            padding: 15px;
             border-radius: 12px;
-            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 100%;
         }
 
-        .contact-title {
-            font-size: 12px;
-            font-weight: bold;
-            color: #8774e1;
-            margin-bottom: 4px;
-        }
-
-        .contact-field {
+        .form-input {
+            width: 100%;
             background-color: var(--tg-header-bg);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
@@ -301,62 +203,34 @@
             color: white;
             font-size: 13px;
             outline: none;
-            width: 100%;
         }
 
-        .contact-field:focus {
-            border-color: var(--tg-link-btn);
-        }
+        .form-input:focus { border-color: var(--tg-link-btn); }
 
-        .contact-btn {
-            background-color: var(--tg-link-btn);
-            color: white;
-            border: none;
-            padding: 11px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-
-        .contact-btn:hover {
-            background-color: #7b68d4;
-        }
-
-        /* Кнопка відправки */
         .final-action {
             background-color: var(--tg-link-btn);
             color: white;
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
             font-weight: bold;
-            font-size: 14px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(135,116,225,0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            font-size: 14px;
+            transition: opacity 0.2s;
+            width: 100%;
         }
 
-        /* Анімація друку */
-        .typing {
-            display: inline-flex;
-            gap: 4px;
-            padding: 4px 0;
-        }
+        .final-action:hover { opacity: 0.9; }
 
+        .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
         .typing-dot {
             width: 6px;
             height: 6px;
-            background: #7f91a4;
+            background: #9ab;
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out both;
         }
-
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 
@@ -364,55 +238,28 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
-
-        /* Статус фідбеку */
-        .status-box {
-            background-color: rgba(46, 196, 182, 0.1);
-            border: 1px solid rgba(46, 196, 182, 0.3);
-            color: #2ec4b6;
-            font-size: 11px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Хедер -->
         <header class="header">
-            <div class="header-left">
-                <div class="header-avatar" id="bot-avatar">🤖</div>
-                <div class="header-info">
-                    <span class="header-name" id="bot-title">Yura Kotovich Bot</span>
-                    <span class="header-status">
-                        <span class="status-dot"></span>онлайн
-                    </span>
-                </div>
+            <div class="header-avatar">🤖</div>
+            <div class="header-info">
+                <span class="header-name">Yura Kotovich Quiz Bot</span>
+                <span class="header-status">онлайн</span>
             </div>
-            <div class="badge-mode" id="app-mode-badge">🌐 Світлий Веб</div>
         </header>
 
-        <!-- Чат область -->
-        <div class="chat-area" id="chat-area">
-            <div class="date-divider">
-                <span class="date-label" id="chat-date">Сьогодні</span>
-            </div>
-        </div>
-
-        <!-- Область вибору дій/відповідей -->
-        <div class="controls-area" id="controls-area">
-            <!-- Сюди динамічно генеруються кнопки/інпути -->
-        </div>
+        <div class="chat-area" id="chat-area"></div>
+        <div class="controls-area" id="controls-area"></div>
     </div>
 
     <script>
-        // --- Налаштування стану системи ---
         const state = {
-            step: 0,
-            isTelegramMode: false,
+            step: 1,
+            isTelegram: false,
+            tgUser: null,
             data: {
                 name: "",
                 email: "",
@@ -424,46 +271,31 @@
             }
         };
 
+        // Запуск визначення Telegram WebApp контексту
+        try {
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.initData) {
+                state.isTelegram = true;
+                tg.ready();
+                tg.expand();
+                if (tg.initDataUnsafe?.user) {
+                    state.tgUser = tg.initDataUnsafe.user;
+                    state.data.name = tg.initDataUnsafe.user.first_name || "Користувач Telegram";
+                }
+            }
+        } catch(e) {
+            console.log("Not in Telegram Client");
+        }
+
         const chatArea = document.getElementById('chat-area');
         const controlsArea = document.getElementById('controls-area');
 
-        // Авто-детект Телеграму
-        window.addEventListener('DOMContentLoaded', () => {
-            const dateStr = new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
-            document.getElementById('chat-date').innerText = dateStr.toUpperCase();
-
-            try {
-                const tg = window.Telegram?.WebApp;
-                if (tg && tg.initData && tg.initData.length > 0) {
-                    state.isTelegramMode = true;
-                    document.getElementById('app-mode-badge').innerText = "💬 Telegram App";
-                    tg.ready();
-                    tg.expand();
-                    
-                    // Беруться дані юзера з Телеграм
-                    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                        const tgUser = tg.initDataUnsafe.user;
-                        state.data.name = tgUser.first_name || "Telegram User";
-                        state.data.email = tgUser.username ? `@${tgUser.username}` : "Не вказано";
-                    }
-                }
-            } catch (e) {
-                console.warn("Telegram API not reachable. Falling back to classic Web.");
-            }
-
-            // Запускаємо крок 1
-            runStep(1);
-        });
-
-        function formatTime() {
+        function getCurrentTime() {
             return new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Рендеримо друк бота
-        function showBotMessage(text) {
+        function addBotMessage(text) {
             const typingId = 'typing-' + Date.now();
-            
-            // Показуємо анімацію друку
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot';
             typingDiv.id = typingId;
@@ -473,266 +305,227 @@
 
             setTimeout(() => {
                 typingDiv.remove();
-                
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'message bot';
-                msgDiv.innerHTML = `
-                    ${text}
-                    <div class="message-time">${formatTime()}</div>
-                `;
+                msgDiv.innerHTML = `${text}<span class="message-time">${getCurrentTime()}</span>`;
                 chatArea.appendChild(msgDiv);
                 chatArea.scrollTop = chatArea.scrollHeight;
-            }, 900);
+            }, 800);
         }
 
-        // Рендеримо відповіді користувача
-        function showUserMessage(text) {
+        function addUserMessage(text) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message user';
-            msgDiv.innerHTML = `
-                ${text}
-                <div class="message-time">
-                    <span>${formatTime()}</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #4fc3f7; margin-left: 2px;"><path d="M20 6L9 17L4 12"/></svg>
-                </div>
-            `;
+            msgDiv.innerHTML = `${text}<span class="message-time">${getCurrentTime()}</span>`;
             chatArea.appendChild(msgDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        // Сценарій квізу
         const scenario = {
             1: {
-                text: "🤖 <b>Швидкий AI-аудит вашої рутини</b><br><br>Пройдіть тест за 60 секунд. Визначте, на якому етапі ви втрачаєте час із ChatGPT, та отримайте персональний план для нашої консультації.",
+                text: () => `🤖 <b>Швидкий AI-аудит вашої рутини</b><br><br>Вітаю! Пройдіть тест за 60 секунд. Визначте, на якому етапі ви втрачаєте час із ChatGPT, та отримайте персональний план для нашої ШІ-консультації.`,
                 type: 'options',
-                options: [
-                    { label: "Пройти безкоштовний аудит 🚀", value: "start", next: 2 }
-                ]
+                options: [{ label: 'Пройти безкоштовний аудит 🚀', value: 'start' }]
             },
             2: {
-                text: "Який напрямок ШІ вас цікавить найбільше?",
+                text: () => `Який напрямок ШІ вас цікавить найбільше?`,
                 type: 'options',
                 field: 'direction',
                 options: [
-                    { label: "🎯 Інструменти та промптинг (стабільний результат)", value: "Інструменти та промптинг", next: 3 },
-                    { label: "💻 AI для розробників (Cursor/Copilot)", value: "AI для розробників", next: 3 },
-                    { label: "⚙️ Автоматизація та агенти (кастомні помічники)", value: "Автоматизація та агенти", next: 3 },
-                    { label: "🖼️ Генерація контенту (Midjourney, Flux, відео)", value: "Генерація контенту", next: 3 }
+                    { label: '🎯 Промптинг та робота в чатах', value: 'Промптинг' },
+                    { label: '💻 AI для IT та кодингу (Cursor...)', value: 'AI для IT' },
+                    { label: '⚙️ Особисті ШІ-агенти та автоматизація', value: 'Автоматизація' },
+                    { label: '🖼️ Креативні нейромережі (дизайн, відео)', value: 'Креатив' }
                 ]
             },
             3: {
-                text: "Який ваш поточний досвід роботи з нейромережами?",
+                text: () => `Ваш поточний досвід роботи з нейромережами?`,
                 type: 'options',
                 field: 'experience',
                 options: [
-                    { label: "🌱 Новачок (хочу стартувати правильно)", value: "Новачок", next: 4 },
-                    { label: "⚡ Практик (є результат, але хаотичний)", value: "Практик", next: 4 },
-                    { label: "💼 Підприємець / Профі (шукаю автоматизацію)", value: "Підприємець / Профі", next: 4 }
+                    { label: 'Новачок (хочу почати без помилок)', value: 'Новачок' },
+                    { label: 'Практик (користуюся часом, але хаотично)', value: 'Практик' },
+                    { label: 'Профі / Бізнес (шукаю кастомні рішення)', value: 'Профі' }
                 ]
             },
             4: {
-                text: "Який формат розбору вашого кейсу для вас найзручніший?",
+                text: () => `У якому форматі провести безкоштовний розбір?`,
                 type: 'options',
                 field: 'format',
                 options: [
-                    { label: "📞 Живий созвон в Telegram (голос + демо)", value: "Живий созвон", next: 5 },
-                    { label: "✍️ Текстовий розбір (промпти та інструкції)", value: "Текстовий розбір", next: 5 }
+                    { label: '📞 Созвон у Telegram (демо екрану)', value: 'Дзвінок' },
+                    { label: '✍️ Текстовий аудит вашого кейсу', value: 'Текстовий розбір' }
                 ]
             },
             5: {
-                text: "Опишіть ваше головне завдання або біль (опціонально).<br><br>💡 <i>Приклад: «Хочу автоматизувати звітність», «Cursor заплутався в коді», «Шукаю промпт».</i>",
+                text: () => `Опишіть ваше головне завдання або рутину, яку хочете автоматизувати (опціонально).`,
                 type: 'input',
-                placeholder: 'Введіть ваш кейс...',
-                next: 6
+                field: 'comment',
+                placeholder: 'Введіть коментар або натисніть Enter...'
             },
             6: {
-                // Цей крок вирішує: показувати контактну форму чи пропустити, якщо ми в TG
-                text: "👤 <b>Залиште контакти для зворотного зв'язку</b><br><br>Оскільки ви зайшли як гість з сайту, вкажіть контакти, куди надіслати підсумки аудиту.",
-                type: 'contact_form',
-                next: 7
+                text: () => `👤 <b>Контактна інформація</b><br><br>Ми помітили, що ви переглядаєте сайт з браузера. Введіть ваші дані, щоб ми зберегли результати та надіслали аналіз.`,
+                type: 'contact_form'
             },
             7: {
-                text: "🧠 <b>Аудит завершено!</b><br><br>Ваші відповіді зафіксовано. Тепер ми точно знаємо, з чого почати.<br><br>Натисніть велику кнопку підтвердження нижче, щоб завершити реєстрацію та відправити результати!",
+                text: () => `🧠 <b>Аудит завершено!</b><br><br>Дані успішно зафіксовано. Тепер ми точно знаємо, з чого розпочати.<br><br><b>Натисніть кнопку нижче, щоб автоматично зберегти відповіді та написати Юрі в особисті чати!</b>`,
                 type: 'final'
             }
         };
 
         function runStep(stepNum) {
-            state.step = stepNum;
-            const stepData = scenario[stepNum];
-            if (!stepData) return;
-
-            // Спеціальний пропуск кроку 6 (контакти), якщо користувач в Telegram
-            if (stepNum === 6 && state.isTelegramMode) {
+            // Якщо ми в Telegram — пропускаємо крок 6 (Форма контактів), адже знаємо юзера з API
+            if (state.isTelegram && stepNum === 6) {
+                state.step = 7;
                 runStep(7);
                 return;
             }
 
-            showBotMessage(stepData.text);
+            const stepData = scenario[stepNum];
+            if (!stepData) return;
 
             setTimeout(() => {
-                controlsArea.innerHTML = '';
-                
-                if (stepData.type === 'options') {
-                    renderOptions(stepData.options, stepData.field);
-                } else if (stepData.type === 'input') {
-                    renderInput(stepData.placeholder, stepData.next);
-                } else if (stepData.type === 'contact_form') {
-                    renderContactForm(stepData.next);
-                } else if (stepData.type === 'final') {
-                    renderFinalButton();
-                }
-            }, 1000);
-        }
-
-        // Рендер варіантів кнопок
-        function renderOptions(options, field) {
-            const grid = document.createElement('div');
-            grid.className = 'options-grid';
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span>${opt.label}</span> <span>➔</span>`;
-                btn.onclick = () => {
-                    showUserMessage(opt.label);
-                    if (field) state.data[field] = opt.value;
-                    controlsArea.innerHTML = '';
-                    runStep(opt.next);
-                };
-                grid.appendChild(btn);
-            });
-            controlsArea.appendChild(grid);
-        }
-
-        // Рендер текстового поля
-        function renderInput(placeholder, nextStepNum) {
-            const container = document.createElement('div');
-            container.className = 'input-group';
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'text-input';
-            input.placeholder = placeholder;
-            
-            input.onkeydown = (e) => {
-                if (e.key === 'Enter') sendBtn.click();
-            };
-
-            const sendBtn = document.createElement('button');
-            sendBtn.className = 'send-btn';
-            sendBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2"/></svg>`;
-            
-            sendBtn.onclick = () => {
-                const val = input.value.trim() || "Пропущено";
-                showUserMessage(val);
-                state.data.comment = val;
-                controlsArea.innerHTML = '';
-                runStep(nextStepNum);
-            };
-
-            container.appendChild(input);
-            container.appendChild(sendBtn);
-            controlsArea.appendChild(container);
-            setTimeout(() => input.focus(), 200);
-        }
-
-        // Рендер форми для неавторизованих вебликів
-        function renderContactForm(nextStepNum) {
-            const card = document.createElement('div');
-            card.className = 'contact-card';
-            card.innerHTML = `
-                <div class="contact-title">Ваші контакти:</div>
-                <input type="text" id="c-name" class="contact-field" placeholder="Ім'я..." required>
-                <input type="email" id="c-mail" class="contact-field" placeholder="Email..." required>
-                <input type="text" id="c-phone" class="contact-field" placeholder="Телефон / Юзернейм...">
-                <button id="c-submit" class="contact-btn">Зберегти контакти ➔</button>
-            `;
-            controlsArea.appendChild(card);
-
-            document.getElementById('c-submit').onclick = () => {
-                const nm = document.getElementById('c-name').value.trim();
-                const em = document.getElementById('c-mail').value.trim();
-                const ph = document.getElementById('c-phone').value.trim();
-
-                if (!nm || !em) {
-                    alert("Ім'я та Email є обов'язковими!");
-                    return;
-                }
-
-                state.data.name = nm;
-                state.data.email = em;
-                state.data.phone = ph || "Не вказано";
-
-                showUserMessage(`Контакти збережено: ${nm} (${em})`);
-                controlsArea.innerHTML = '';
-                runStep(nextStepNum);
-            };
-        }
-
-        // Фінальна кнопка відправки та переадресації
-        function renderFinalButton() {
-            const btn = document.createElement('button');
-            btn.className = 'final-action';
-            btn.innerHTML = `<span>👉 ВІДПРАВИТИ ТА ЗАБРОНЮВАТИ МІСЦЕ</span>`;
-            
-            btn.onclick = async () => {
-                btn.disabled = true;
-                btn.innerText = "НАДСИЛАННЯ РЕЗУЛЬТАТІВ...";
-
-                const payload = {
-                    source: state.isTelegramMode ? "Telegram WebApp" : "Website",
-                    name: state.data.name || "Гість",
-                    email: state.data.email || "Не вказано",
-                    phone: state.data.phone || "Не вказано",
-                    direction: state.data.direction || "Не вибрано",
-                    experience: state.data.experience || "Не вибрано",
-                    format: state.data.format || "Не вибрано",
-                    comment: state.data.comment || "Не вказано"
-                };
-
-                // Відправляємо на захищений Cloudflare Pages Function backend proxy
-                try {
-                    await fetch('/api/submit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                } catch(e) {
-                    console.error("Помилка відправки на бекенд:", e);
-                }
-
-                // Показуємо статус успішності в чаті
-                const statusBox = document.createElement('div');
-                statusBox.className = 'status-box';
-                statusBox.innerText = "✓ Заявка успішно зафіксована! Перенаправляємо в чат до Юри...";
-                controlsArea.innerHTML = '';
-                controlsArea.appendChild(statusBox);
-
-                // Через 1 секунду перекидаємо користувача в приватні до Юри з pre-filled повідомленням!
+                addBotMessage(stepData.text());
                 setTimeout(() => {
-                    let textMsg = `Привіт, Юро! Я пройшов Швидкий AI-аудит 🤖\n\n`;
-                    textMsg += `🎯 Напрямок: ${payload.direction}\n`;
-                    textMsg += `📊 Досвід: ${payload.experience}\n`;
-                    textMsg += `📞 Формат: ${payload.format}\n`;
-                    textMsg += `📝 Мій кейс: ${payload.comment}\n`;
-                    textMsg += `👤 Джерело: ${payload.source} (${payload.name})`;
-                    
-                    const url = `https://t.me/yura_kotovich?text=${encodeURIComponent(textMsg)}`;
-                    
-                    if (state.isTelegramMode) {
-                        window.open(url, '_blank');
-                        // Спроба закрити WebApp у Телеграм
-                        if (window.Telegram?.WebApp) {
-                            window.Telegram.WebApp.close();
-                        }
-                    } else {
-                        window.open(url, '_blank');
+                    renderControls(stepData);
+                }, 900);
+            }, 300);
+        }
+
+        function renderControls(stepData) {
+            controlsArea.innerHTML = '';
+
+            if (stepData.type === 'options') {
+                const grid = document.createElement('div');
+                grid.className = 'options-grid';
+                stepData.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = opt.label;
+                    btn.onclick = () => {
+                        addUserMessage(opt.label);
+                        if (stepData.field) state.data[stepData.field] = opt.value;
+                        controlsArea.innerHTML = '';
+                        state.step++;
+                        runStep(state.step);
+                    };
+                    grid.appendChild(btn);
+                });
+                controlsArea.appendChild(grid);
+            } 
+            else if (stepData.type === 'input') {
+                const group = document.createElement('div');
+                group.className = 'input-group';
+                const input = document.createElement('input');
+                input.className = 'text-input';
+                input.placeholder = stepData.placeholder;
+                
+                const sendBtn = document.createElement('button');
+                sendBtn.className = 'send-btn';
+                sendBtn.innerHTML = '➔';
+
+                const submitInput = () => {
+                    const val = input.value.trim() || "Пропущено";
+                    addUserMessage(val);
+                    state.data.comment = val;
+                    controlsArea.innerHTML = '';
+                    state.step++;
+                    runStep(state.step);
+                };
+
+                input.onkeydown = (e) => { if (e.key === 'Enter') submitInput(); };
+                sendBtn.onclick = submitInput;
+
+                group.appendChild(input);
+                group.appendChild(sendBtn);
+                controlsArea.appendChild(group);
+                input.focus();
+            } 
+            else if (stepData.type === 'contact_form') {
+                const form = document.createElement('div');
+                form.className = 'form-container';
+                form.innerHTML = `
+                    <input type="text" id="c-name" class="form-input" placeholder="Ваше ім'я" required>
+                    <input type="text" id="c-email" class="form-input" placeholder="Telegram нікнейм або Email" required>
+                    <input type="text" id="c-phone" class="form-input" placeholder="Номер телефону (опціонально)">
+                    <button id="form-submit-btn" class="final-action">Зберегти та продовжити ➔</button>
+                `;
+                controlsArea.appendChild(form);
+
+                document.getElementById('form-submit-btn').onclick = () => {
+                    const nameVal = document.getElementById('c-name').value.trim();
+                    const emailVal = document.getElementById('c-email').value.trim();
+                    const phoneVal = document.getElementById('c-phone').value.trim();
+
+                    if (!nameVal || !emailVal) {
+                        alert("Будь ласка, введіть ім'я та контакт для зв'язку!");
+                        return;
                     }
-                }, 1200);
+
+                    state.data.name = nameVal;
+                    state.data.email = emailVal;
+                    state.data.phone = phoneVal || "Не вказано";
+
+                    addUserMessage(`Контакти збережено: ${nameVal}`);
+                    controlsArea.innerHTML = '';
+                    state.step++;
+                    runStep(state.step);
+                };
+            } 
+            else if (stepData.type === 'final') {
+                const btn = document.createElement('button');
+                btn.className = 'final-action';
+                btn.textContent = '👉 НАДІСЛАТИ РЕЗУЛЬТАТИ ТА НАПИСАТИ ЮРІ';
+                btn.onclick = sendDataAndRedirect;
+                controlsArea.appendChild(btn);
+            }
+        }
+
+        async function sendDataAndRedirect() {
+            // Збираємо корисне навантаження
+            const payload = {
+                source: state.isTelegram ? "Telegram Bot" : "Website",
+                q1: state.data.name || (state.tgUser ? `${state.tgUser.first_name} (@${state.tgUser.username || ''})` : "Сайт Клієнт"),
+                q2: state.data.direction || "Не вибрано",
+                q3: state.data.experience || "Не вибрано",
+                email: state.data.email || (state.tgUser ? `@${state.tgUser.username || ''}` : "Не вказано"),
+                comment: state.data.comment || "Не введено"
             };
 
-            controlsArea.appendChild(btn);
+            // Візуальний статус завантаження на кнопці
+            const btn = document.querySelector('.final-action');
+            btn.textContent = '⏳ НАДСИЛАННЯ / ЗБЕРЕЖЕННЯ...';
+            btn.disabled = true;
+
+            // Відправляємо на наш серверний проксі бекенд Cloudflare Functions
+            try {
+                await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch(e) {
+                console.error("Server submission failed", e);
+            }
+
+            // Формуємо красивий пре-заповнений текст для чату з тобою
+            let messageText = `Привіт, Юра! Я пройшов Швидкий AI-Аудит 🤖\n\n`;
+            messageText += `🎯 Напрямок: ${payload.q2}\n`;
+            messageText += `📈 Досвід: ${payload.q3}\n`;
+            messageText += `📞 Спосіб розбору: ${state.data.format || 'Не обрано'}\n`;
+            messageText += `📝 Задача: ${payload.comment}\n`;
+            messageText += `👤 Контакти: ${payload.q1} (${payload.email})`;
+
+            const encoded = encodeURIComponent(messageText);
+            btn.textContent = 'УСПІШНО! Перехід у чат...';
+
+            setTimeout(() => {
+                window.open(`https://t.me/yura_kotovich?text=${encoded}`, '_blank');
+            }, 800);
         }
+
+        // Запуск квізу
+        window.onload = () => { runStep(1); };
     </script>
 </body>
 </html>
