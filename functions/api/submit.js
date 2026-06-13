@@ -1,70 +1,59 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
-  
+
   try {
     const data = await request.json();
-    const source = data.source || "Website";
 
-    // Універсальний гарний шаблон повідомлення для Телеграм бота
-    const msg = `
-<b>🤖 НОВА ЗАЯВКА - AI-АУДИТ [${source.toUpperCase()}]</b>
+    // Формуємо красиве форматоване повідомлення для вашого Telegram каналу/боту
+    const formattedText = `
+<b>🤖 НОВА ЗАЯВКА - AI-АУДИТ [${(data.source || 'WEB').toUpperCase()}]</b>
 
-👤 <b>Клієнт:</b> ${data.name}
-📧 <b>Email/Telegram:</b> ${data.email}
-📞 <b>Телефон:</b> ${data.phone}
-
-🎯 <b>Напрямок ШІ:</b>
-${data.direction}
-
-📊 <b>Поточний досвід:</b>
-${data.experience}
-
-📞 <b>Бажаний формат:</b>
-${data.format}
-
-📝 <b>Коментар / Головне завдання:</b>
-${data.comment || 'Не вказано'}
+👤 <b>Клієнт:</b> ${data.q1 || 'Не вказано'}
+📧 <b>Email/Telegram:</b> ${data.email || 'Не вказано'}
+🎯 <b>Напрямок:</b> ${data.q2 || 'Не вказано'}
+📊 <b>Поточний досвід:</b> ${data.q3 || 'Не вказано'}
+📝 <b>Кейс / Коментар:</b> ${data.comment || 'Не вказано'}
     `.trim();
 
-    // За замовчуванням листи будуть летіти на вашу пошту. 
-    // Якщо хочете змінити отримувача — просто впишіть вашу пошту замість 'profirise@gmail.com'
-    const adminEmail = "profirise@gmail.com"; 
+    // Твоя реальна пошта отримувача з налаштувань або дефолтна
+    const myEmail = env.NOTIFICATION_RECEIVER_EMAIL || 'profirise@gmail.com'; 
 
-    // Запускаємо відправку в Телеграм робота та на пошту Resend паралельно
+    // Виконуємо сповіщення в Telegram та на Email паралельно
     await Promise.all([
-      sendTG(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, msg),
-      sendEmail(env.RESEND_API_KEY, adminEmail, `Нова заявка AIBiz Quiz (${data.name})`, msg)
+      sendTG(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_CHAT_ID, formattedText),
+      sendEmail(env.RESEND_API_KEY, myEmail, `Нова заявка AIBiz Quiz (${data.q1 || 'Клієнт'})`, formattedText)
     ]);
 
-    return new Response(JSON.stringify({ status: 'success' }), {
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ status: "success" }), {
+      headers: { "Content-Type": "application/json" }
     });
-  } catch(e) {
-    return new Response(JSON.stringify({ error: e.message }), { 
+
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
   }
 }
 
+// Функція надсилання у Telegram
 async function sendTG(token, chat, text) {
-  if (!token || !chat) {
-    console.warn("TELEGRAM_BOT_TOKEN або TELEGRAM_CHAT_ID не налаштовані.");
-    return;
-  }
-  const tgUrl = `https://api.telegram.org/bot${token}/sendMessage`;
-  await fetch(tgUrl, {
+  if (!token || !chat) return;
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chat, text: text, parse_mode: 'HTML' })
+    body: JSON.stringify({
+      chat_id: chat,
+      text: text,
+      parse_mode: 'HTML'
+    })
   });
 }
 
+// Функція надсилання через сервіс Resend
 async function sendEmail(key, to, subject, text) {
-  if (!key) {
-    console.warn("RESEND_API_KEY не налаштований. Лист не відправлено.");
-    return;
-  }
+  if (!key) return;
   const emailHtml = text.replace(/\n/g, '<br>');
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -73,14 +62,13 @@ async function sendEmail(key, to, subject, text) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'AIBiz Quiz <onboarding@resend.dev>', // Дозволений безкоштовний відправник у Resend
+      from: 'AIBiz Quiz <onboarding@resend.dev>',
       to: [to],
       subject: subject,
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #1f2937; max-width: 600px; border: 1px solid #e5e7eb; border-radius: 8px;">
-          <h2 style="color: #8774e1; margin-top: 0;">🤖 Нова заявка з Квізу</h2>
-          <hr style="border-color: #e5e7eb; margin: 15px 0;">
-          <div style="font-size: 14px; line-height: 1.6;">
+          <h2 style="color: #8774e1; margin-top: 0;">🤖 Результати AI-Аудиту</h2>
+          <div style="margin-top: 15px; font-size: 15px; line-height: 1.6;">
             ${emailHtml}
           </div>
         </div>
