@@ -2,611 +2,280 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI-Аудит Рутини | Quiz</title>
-    <!-- Telegram Web App Support -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Консультації | Персональний план</title>
+    <!-- Правильне підключення Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --tg-bg-color: #17212b;       
-            --tg-header-bg: #242f3d;      
-            --tg-text-color: #ffffff;     
-            --tg-secondary-text: #7f91a4; 
-            --tg-msg-in: #182533;         
-            --tg-msg-out: #2b5278;        
-            --tg-link-btn: #8774e1;       
-            --tg-btn-text: #ffffff;
-            --input-bg: #242f3d;
-            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        /* Базове сховання кроків */
+        .step { 
+            display: none; 
+        }
+        .step.active { 
+            display: block; 
+            animation: fadeIn 0.4s ease-in-out; /* Плавна анімація */
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: #0e1621;
-            font-family: var(--font-family);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--tg-text-color);
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            background-color: var(--tg-bg-color);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-        }
-
-        @media (min-width: 500px) {
-            .app-container {
-                height: 90vh;
-                border-radius: 12px;
-                overflow: hidden;
-                border: 1px solid #111e2d;
-            }
-        }
-
-        .header {
-            background-color: var(--tg-header-bg);
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #0e1621;
-            z-index: 10;
-        }
-
-        .header-avatar {
-            width: 38px;
-            height: 38px;
-            background-color: #8774e1;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .header-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .header-status {
-            font-size: 11px;
-            color: #4bacf0;
-        }
-
-        .chat-area {
-            flex: 1;
-            padding: 20px 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scroll-behavior: smooth;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.45;
-            position: relative;
-            word-wrap: break-word;
-            animation: fadeIn 0.25s ease-out;
-        }
-
+        /* Анімація появи */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .message.bot {
-            align-self: flex-start;
-            background-color: var(--tg-msg-in);
-            border-bottom-left-radius: 4px;
+        /* Стилізація вибраної картки (Radio) */
+        .option-card input:checked + span {
+            color: #06b6d4; /* text-cyan-500 */
+        }
+        .option-card:has(input:checked) {
+            border-color: #06b6d4 !important;
+            background-color: #2a3a44 !important;
         }
 
-        .message.user {
-            align-self: flex-end;
-            background-color: var(--tg-msg-out);
-            border-bottom-right-radius: 4px;
-        }
-
-        .message-time {
-            display: block;
-            text-align: right;
-            font-size: 9px;
-            color: rgba(255,255,255,0.4);
-            margin-top: 4px;
-        }
-
-        .controls-area {
-            background-color: var(--tg-header-bg);
-            padding: 12px;
-            min-height: 60px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border-top: 1px solid #0e1621;
-        }
-
-        .options-grid {
-            display: grid;
-            gap: 8px;
-        }
-
-        .option-btn {
-            background: #17212b;
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #4bacf0;
-            padding: 12px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: left;
-            font-family: inherit;
-            font-size: 13.5px;
-            transition: all 0.15s ease;
-        }
-
-        .option-btn:hover {
-            background: rgba(135, 116, 225, 0.12);
-            border-color: var(--tg-link-btn);
-            color: white;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .text-input {
-            flex: 1;
-            background-color: var(--tg-bg-color);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 11px 14px;
-            color: white;
-            font-family: inherit;
-            font-size: 13.5px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .text-input:focus {
-            border-color: var(--tg-link-btn);
-        }
-
-        .send-btn {
-            width: 44px;
-            height: 44px;
-            background-color: var(--tg-link-btn);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.15s;
-        }
-
-        .send-btn:active {
-            transform: scale(0.95);
-        }
-
-        .contact-form {
-            background: #17212b;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .contact-input {
-            width: 100%;
-            background: var(--tg-header-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 10px;
-            color: white;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .contact-input:focus {
-            border-color: var(--tg-link-btn);
-        }
-
-        .final-action {
-            background-color: var(--tg-link-btn);
-            color: white;
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            transition: opacity 0.2s;
-        }
-
-        .final-action:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .typing-bubble {
-            align-self: flex-start;
-            background-color: var(--tg-msg-in);
-            padding: 12px 16px;
-            border-radius: 16px;
-            border-bottom-left-radius: 4px;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background-color: #7f91a4;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        /* Підсвітка помилки валідації */
+        .input-error {
+            border-color: #ef4444 !important;
         }
     </style>
 </head>
-<body>
+<body class="bg-[#121212] text-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
 
-    <div class="app-container">
-        <header class="header">
-            <div class="header-avatar">🤖</div>
-            <div class="header-info">
-                <span class="header-name">Kotovich Assistant</span>
-                <span class="header-status">онлайн</span>
+    <div class="max-w-xl w-full bg-[#1e1e1e] p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-800 relative">
+        
+        <!-- Лінія прогресу (Progress Bar) -->
+        <div class="w-full bg-gray-800 h-2 rounded-full mb-8 overflow-hidden">
+            <div id="progress" class="bg-cyan-500 h-full w-[0%] transition-all duration-500 ease-out"></div>
+        </div>
+
+        <form id="quizForm" class="relative">
+            <!-- ЕКРАН 0: ВСТУП -->
+            <div class="step active" data-progress="10">
+                <h1 class="text-2xl md:text-3xl font-bold mb-4 text-cyan-400">Персональний план впровадження ШІ під ваші задачі</h1>
+                <p class="text-gray-300 mb-6 leading-relaxed">
+                    Вітаю! Штучний інтелект може економити години роботи, а може заплутати ще більше. Моє завдання — допомогти вам впровадити ШІ без стресу та зайвих дій.
+                </p>
+                <p class="text-gray-400 mb-8 text-sm">
+                    Я працюю з обмеженою кількістю клієнтів. Дайте відповідь на кілька запитань: безкоштовно проаналізую ваш запит, щоб запропонувати конкретне рішення під ваші задачі та бюджет. Це займе 1 хвилину.
+                </p>
+                <button type="button" onclick="nextStep()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-4 rounded-xl transition shadow-lg shadow-cyan-500/20 cursor-pointer text-lg">
+                    Почнемо? 👇
+                </button>
             </div>
-        </header>
 
-        <div class="chat-area" id="chat-area"></div>
-        <div class="controls-area" id="controls-area"></div>
+            <!-- ЕКРАН 1: НАПРЯМОК -->
+            <div class="step" data-progress="25">
+                <h2 class="text-xl font-semibold mb-6">Який напрямок ШІ вас цікавить найбільше?</h2>
+                <div class="space-y-3">
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="direction" value="Промптинг" class="hidden" onchange="autoNext()">
+                        <span>🎯 Інструменти та промптинг (стабільний результат)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="direction" value="Cursor/Copilot" class="hidden" onchange="autoNext()">
+                        <span>💻 AI для розробників (Cursor / Copilot)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="direction" value="Автоматизація" class="hidden" onchange="autoNext()">
+                        <span>⚙️ Автоматизація та агенти (кастомні помічники)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="direction" value="Контент" class="hidden" onchange="autoNext()">
+                        <span>🖼️ Генерація контенту (Midjourney, Flux, відео)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="direction" value="Своє питання" class="hidden" onchange="autoNext()">
+                        <span>👤 В мене своє питання</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ЕКРАН 2: ДОСВІД -->
+            <div class="step" data-progress="50">
+                <h2 class="text-xl font-semibold mb-6">Який ваш поточний досвід роботи з нейромережами?</h2>
+                <div class="space-y-3">
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="experience" value="Новачок" class="hidden" onchange="autoNext()">
+                        <span>🌱 Новачок (хочу стартувати правильно)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="experience" value="Практик" class="hidden" onchange="autoNext()">
+                        <span>⚡ Практик (є результат, але хаотичний)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="experience" value="Профі" class="hidden" onchange="autoNext()">
+                        <span>💼 Підприємець / Профі (шукаю автоматизацію)</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="experience" value="Анонімно" class="hidden" onchange="autoNext()">
+                        <span>🗨 Не хочу вказувати</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ЕКРАН 3: ФОРМАТ -->
+            <div class="step" data-progress="75">
+                <h2 class="text-xl font-semibold mb-6">Який формат розбору вашого кейсу для вас найзручніший?</h2>
+                <div class="space-y-3">
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="format" value="Созвон" class="hidden" onchange="autoNext()">
+                        <span>📲 Живий созвон</span>
+                    </label>
+                    <label class="option-card flex items-center p-4 bg-[#262626] border border-gray-700 rounded-xl cursor-pointer hover:border-cyan-500 transition">
+                        <input type="radio" name="format" value="Текст" class="hidden" onchange="autoNext()">
+                        <span>📄 Текстовий розбір, інструкції, рішення</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ЕКРАН 4: ОПИС ЗАВДАННЯ -->
+            <div class="step" data-progress="90">
+                <h2 class="text-xl font-semibold mb-2">Опишіть ваше головне завдання або біль</h2>
+                <p class="text-xs text-gray-400 mb-4">💡 Опціонально. Приклад: «Хочу автоматизувати звітність», «Cursor заплутався в коді», «Шукаю промпт».</p>
+                <textarea name="task" rows="4" placeholder="Напишіть тут..." class="w-full p-4 bg-[#262626] border border-gray-700 rounded-xl focus:border-cyan-500 focus:outline-none mb-6 resize-none text-gray-100 transition-colors"></textarea>
+                <button type="button" onclick="nextStep()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-4 rounded-xl transition cursor-pointer text-lg">
+                    Далі ➡️
+                </button>
+            </div>
+
+            <!-- ЕКРАН 5: КОНТАКТИ -->
+            <div class="step" data-progress="100">
+                <h2 class="text-xl font-semibold mb-2 text-cyan-400">Дяку! Матеріал для аналізу зібрано.</h2>
+                <p class="text-sm text-gray-400 mb-6">Куди надіслати ваш персональний план ШІ-рішення?</p>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-2 font-semibold">Ваше ім'я</label>
+                        <input type="text" id="clientName" placeholder="Іван" class="w-full p-3 bg-[#262626] border border-gray-700 rounded-xl focus:border-cyan-500 focus:outline-none text-gray-100 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-2 font-semibold">Email або Telegram Username <span class="text-red-400">*</span></label>
+                        <input type="text" id="clientContact" required placeholder="@username або email" class="w-full p-3 bg-[#262626] border border-gray-700 rounded-xl focus:border-cyan-500 focus:outline-none text-gray-100 transition-colors">
+                        <span id="contactError" class="text-red-500 text-xs hidden mt-2 block">Будь ласка, вкажіть контакт для зв'язку</span>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-2 font-semibold">Номер телефону (опціонально)</label>
+                        <input type="tel" id="clientPhone" placeholder="+380..." class="w-full p-3 bg-[#262626] border border-gray-700 rounded-xl focus:border-cyan-500 focus:outline-none text-gray-100 transition-colors">
+                        <span class="text-[10px] text-gray-500">для зв'язку в Viber / WhatsApp</span>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-4 rounded-xl transition text-lg mt-2 cursor-pointer shadow-lg shadow-emerald-500/20">
+                        Отримати покроковий план
+                    </button>
+                </div>
+            </div>
+
+            <!-- КНОПКА НАЗАД (Тепер знизу) -->
+            <div id="prevBtnWrapper" class="hidden mt-8 text-center">
+                <button type="button" id="prevBtn" class="text-gray-500 hover:text-white text-sm transition-colors cursor-pointer hover:underline">
+                    ← Назад
+                </button>
+            </div>
+
+        </form>
+
+        <!-- ЕКРАН 6: ФІНАЛ -->
+        <div id="finalScreen" class="hidden text-center py-8">
+            <div class="text-5xl mb-6">🎉</div>
+            <h2 class="text-2xl font-bold mb-4 text-emerald-400">Дякую, заявку прийнято!</h2>
+            <p class="text-gray-300 mb-2 leading-relaxed">Я вже вивчаю ваші відповіді. Вартість індивідуального розбору вашого кейсу (созвон або текстове рішення з інструкціями) — <span class="text-white font-bold">500 грн/год</span>.</p>
+            <p class="text-gray-400 text-sm mt-4">Зв'яжуся з вами протягом 2 годин у вказаному месенджері або по email, щоб узгодити час сесії.</p>
+        </div>
+
     </div>
 
+    <!-- JAVASCRIPT ЛОГІКА -->
     <script>
-        // Детект запуску всередині Telegram WebApp або за межами
-        let isTelegram = false;
-        let telegramUser = null;
-        try {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== "") {
-                isTelegram = true;
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
-                telegramUser = window.Telegram.WebApp.initDataUnsafe?.user;
+        let currentStep = 0;
+        const steps = document.querySelectorAll('.step');
+        const progressBar = document.getElementById('progress');
+        const prevBtnWrapper = document.getElementById('prevBtnWrapper');
+        const prevBtn = document.getElementById('prevBtn');
+        const finalScreen = document.getElementById('finalScreen');
+        const quizForm = document.getElementById('quizForm');
+        const contactInput = document.getElementById('clientContact');
+        const contactError = document.getElementById('contactError');
+
+        // Оновлення вигляду форми при зміні кроку
+        function updateForm() {
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === currentStep);
+            });
+
+            // Оновлення прогрес-бару
+            const progress = steps[currentStep].getAttribute('data-progress');
+            progressBar.style.width = `${progress}%`;
+
+            // Показувати/ховати кнопку Назад
+            if (currentStep > 0 && currentStep < steps.length) {
+                prevBtnWrapper.classList.remove('hidden');
+            } else {
+                prevBtnWrapper.classList.add('hidden');
             }
-        } catch (e) {
-            console.warn("Помилка ініціалізації Telegram WebApp API", e);
         }
 
-        const state = {
-            step: 0,
-            data: {
-                name: (telegramUser ? telegramUser.first_name : ""),
-                email: "",
-                phone: "",
-                direction: "",
-                experience: "",
-                format: "",
-                comment: ""
+        // Перехід далі
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateForm();
             }
-        };
-
-        const chatArea = document.getElementById('chat-area');
-        const controlsArea = document.getElementById('controls-area');
-
-        function getCurrentTime() {
-            const now = new Date();
-            return now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function addBotMessage(text, callback) {
-            const typingBubble = document.createElement('div');
-            typingBubble.className = 'typing-bubble';
-            typingBubble.innerHTML = `
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
-            chatArea.appendChild(typingBubble);
-            chatArea.scrollTop = chatArea.scrollHeight;
+        // Перехід назад
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateForm();
+            }
+        });
 
+        // Автоперехід при виборі Radio-кнопки
+        function autoNext() {
             setTimeout(() => {
-                typingBubble.remove();
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message bot';
-                msgDiv.innerHTML = `${text}<span class="message-time">${getCurrentTime()}</span>`;
-                chatArea.appendChild(msgDiv);
-                chatArea.scrollTop = chatArea.scrollHeight;
-                if (callback) callback();
-            }, 1000);
+                nextStep();
+            }, 400); 
         }
 
-        function addUserMessage(text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message user';
-            msgDiv.innerHTML = `${text}<span class="message-time">${getCurrentTime()}</span>`;
-            chatArea.appendChild(msgDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
+        // Прибрати помилку валідації при введенні тексту
+        contactInput.addEventListener('input', () => {
+            contactInput.classList.remove('input-error');
+            contactError.classList.add('hidden');
+        });
 
-        const scenario = {
-            1: {
-                text: `🤖 <b>Швидкий AI-аудит вашої рутини</b><br><br>Пройдіть тест за 60 секунд. Визначте, на якому етапі ви втрачаєте час із ChatGPT, та отримайте персональний план для нашої консультації.`,
-                type: 'options',
-                options: [{ label: 'Пройти безкоштовний аудит 🚀', value: 'start', action: true }]
-            },
-            2: {
-                text: `Який напрямок ШІ вас цікавить найбільше?`,
-                type: 'options',
-                field: 'direction',
-                options: [
-                    { label: '🎯 Інструменти та промптинг (стабільний результат)', value: 'Інструменти та промптинг' },
-                    { label: '💻 AI для розробників (Cursor/Copilot)', value: 'AI для розробників' },
-                    { label: '⚙️ Автоматизація та агенти (кастомні помічники)', value: 'Автоматизація та агенти' },
-                    { label: '🖼️ Генерація контенту (Midjourney, Flux, відео)', value: 'Генерація контенту' },
-                    { label: '👤 В мене своє питання', value: 'В мене своє питання' }
-                ]
-            },
-            3: {
-                text: `Який ваш поточний досвід роботи з нейромережами?`,
-                type: 'options',
-                field: 'experience',
-                options: [
-                    { label: '🌱 Новачок (хочу стартувати правильно)', value: 'Новачок' },
-                    { label: '⚡ Практик (є результат, але хаотичний)', value: 'Практик' },
-                    { label: '💼 Підприємець / Профі (шукаю автоматизацію)', value: 'Підприємець / Профі' },
-                    { label: '🗨 Не хочу вказувати', value: 'Не хочу вказувати' }
-                ]
-            },
-            4: {
-                text: `Який формат розбору вашого кейсу для вас найзручніший?`,
-                type: 'options',
-                field: 'format',
-                options: [
-                    { label: '📞 Живий созвон в Telegram (голос + демо)', value: 'Живий созвон' },
-                    { label: '✍️ Текстовий розбір (промпти та інструкції)', value: 'Текстовий розбір' }
-                ]
-            },
-            5: {
-                text: `Опишіть ваше головне завдання або біль (опціонально).<br><br>💡 Приклад: «Хочу автоматизувати звітність», «Cursor заплутався в коді», «Шукаю промпт».`,
-                type: 'input',
-                placeholder: 'Напишіть або натисніть Надіслати щоб пропустити...'
-            },
-            6: {
-                text: `👤 <b>Залиште ваші контакти для зв'язку</b><br><br>Будь ласка, вкажіть ваше ім'я та email/телефон, щоб ми надіслали вам підготовлений аналіз.`,
-                type: 'contact_form'
-            },
-            7: {
-                text: `🧠 <b>Аудит завершено!</b><br><br>Ваші відповіді зафіксовано. Тепер ми точно знаємо, з чого почати консультацію.<br><br><b>Натисніть кнопку нижче, щоб надіслати форму та написати Юрі в особисті.</b>`,
-                type: 'final'
-            }
-        };
+        // Обробка відправки форми
+        quizForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const contactValue = contactInput.value.trim();
 
-        function runStep(stepNum) {
-            state.step = stepNum;
-            const stepData = scenario[stepNum];
-            if (!stepData) return;
-
-            // Якщо ми в Telegram WebApp - пропускаємо форму контактів (Крок 6)
-            if (isTelegram && stepNum === 6) {
-                runStep(7);
-                return;
+            // Валідація обов'язкового поля
+            if (!contactValue) {
+                contactInput.classList.add('input-error');
+                contactError.classList.remove('hidden');
+                return; 
             }
 
-            addBotMessage(stepData.text, () => {
-                if (stepData.type === 'options') {
-                    showOptions(stepData.options);
-                } else if (stepData.type === 'input') {
-                    showInputField(stepData.placeholder);
-                } else if (stepData.type === 'contact_form') {
-                    showContactForm();
-                } else if (stepData.type === 'final') {
-                    showFinalButton();
-                }
-            });
-        }
-
-        function showOptions(options) {
-            controlsArea.innerHTML = '';
-            const grid = document.createElement('div');
-            grid.className = 'options-grid';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt.label;
-                btn.onclick = () => {
-                    addUserMessage(opt.label);
-                    controlsArea.innerHTML = '';
-                    if (!opt.action) {
-                        state.data[scenario[state.step].field] = opt.value;
-                    }
-                    setTimeout(() => runStep(state.step + 1), 500);
-                };
-                grid.appendChild(btn);
-            });
-            controlsArea.appendChild(grid);
-        }
-
-        function showInputField(placeholder) {
-            controlsArea.innerHTML = '';
-            const group = document.createElement('div');
-            group.className = 'input-group';
-
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'text-input';
-            input.placeholder = placeholder;
-
-            const btn = document.createElement('button');
-            btn.className = 'send-btn';
-            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-
-            const submitValue = () => {
-                const val = input.value.trim() || "Пропущено";
-                state.data.comment = val;
-                addUserMessage(val);
-                controlsArea.innerHTML = '';
-                setTimeout(() => runStep(state.step + 1), 500);
+            // Збір даних
+            const formData = new FormData(quizForm);
+            const data = {
+                name: document.getElementById('clientName').value,
+                contact: contactValue,
+                phone: document.getElementById('clientPhone').value,
+                direction: formData.get('direction'),
+                experience: formData.get('experience'),
+                format: formData.get('format'),
+                task: formData.get('task')
             };
 
-            btn.onclick = submitValue;
-            input.onkeydown = (e) => { if (e.key === 'Enter') submitValue(); };
+            console.log("Дані готові до відправки:", data);
 
-            group.appendChild(input);
-            group.appendChild(btn);
-            controlsArea.appendChild(group);
-            setTimeout(() => input.focus(), 150);
-        }
-
-        function showContactForm() {
-            controlsArea.innerHTML = '';
-            const form = document.createElement('div');
-            form.className = 'contact-form';
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.className = 'contact-input';
-            nameInput.placeholder = "Ваше ім'я";
-            nameInput.value = state.data.name;
-
-            const emailInput = document.createElement('input');
-            emailInput.type = 'text';
-            emailInput.className = 'contact-input';
-            emailInput.placeholder = "Ваш Email або Telegram нік";
-
-            const btn = document.createElement('button');
-            btn.className = 'final-action';
-            btn.textContent = "Зберегти та продовжити ➔";
-
-            btn.onclick = () => {
-                const name = nameInput.value.trim();
-                const email = emailInput.value.trim();
-                if (!name || !email) {
-                    alert("Будь ласка, заповніть обидва поля!");
-                    return;
-                }
-                state.data.name = name;
-                state.data.email = email;
-                addUserMessage(`Мене звати ${name}, контакт: ${email}`);
-                controlsArea.innerHTML = '';
-                setTimeout(() => runStep(state.step + 1), 500);
-            };
-
-            form.appendChild(nameInput);
-            form.appendChild(emailInput);
-            form.appendChild(btn);
-            controlsArea.appendChild(form);
-        }
-
-        function showFinalButton() {
-            controlsArea.innerHTML = '';
-            const btn = document.createElement('button');
-            btn.className = 'final-action';
-            btn.id = 'submit-btn-quiz';
-            btn.textContent = '🚀 НАДІСЛАТИ ТА НАПИСАТИ В ОСОБИСТІ';
-
-            btn.onclick = sendResultsToServer;
-            controlsArea.appendChild(btn);
-        }
-
-        function sendResultsToServer() {
-            const submitBtn = document.getElementById('submit-btn-quiz');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = '⏱️ НАДСИЛАННЯ ДАНИХ...';
-            }
-
-            const payload = {
-                source: isTelegram ? "Telegram WebApp" : "Website",
-                name: state.data.name || (telegramUser ? telegramUser.first_name : "Анонімний користувач"),
-                email: state.data.email || (telegramUser ? `@${telegramUser.username || 'tg'}` : "Не вказано"),
-                phone: state.data.phone || "Не вказано",
-                direction: state.data.direction || "Не вказано",
-                experience: state.data.experience || "Не вказано",
-                format: state.data.format || "Не вказано",
-                comment: state.data.comment || "Не вказано"
-            };
-
-            // Надсилаємо дані на бекенд у Cloudflare на API
-            fetch('/api/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                openTelegramChat(payload);
-            })
-            .catch(err => {
-                console.error("Бекенд відповів із помилкою, але відкриваємо чат:", err);
-                openTelegramChat(payload);
-            });
-        }
-
-        function openTelegramChat(payload) {
-            let message = `Привіт, Юра! Пройшов AI-аудит 🤖\n\n`;
-            message += `🎯 Напрямок: ${payload.direction}\n`;
-            message += `📈 Досвід: ${payload.experience}\n`;
-            message += `📞 Формат: ${payload.format}\n`;
-            message += `📝 Мій кейс: ${payload.comment}\n`;
-            if (payload.source !== "Telegram WebApp") {
-                message += `👤 Контакти: ${payload.name} (${payload.email})\n`;
-            }
-            message += `\nХочу забронювати місце на консультацію.`;
-
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://t.me/yura_kotovich?text=${encodedMessage}`, '_blank');
-        }
-
-        window.onload = () => {
-            setTimeout(() => runStep(1), 500);
-        };
+            // Перемикання на фінальний екран
+            quizForm.classList.add('hidden');
+            // Ховаємо прогрес-бар і кнопку "Назад"
+            progressBar.parentElement.classList.add('hidden'); 
+            prevBtnWrapper.classList.add('hidden');
+            
+            finalScreen.classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
