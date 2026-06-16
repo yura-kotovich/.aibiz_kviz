@@ -184,6 +184,11 @@
 
     <!-- JAVASCRIPT ЛОГІКА -->
     <script>
+        // ──────────────────────────────────────────────────────────────
+        // URL твого Cloudflare Worker
+        // ──────────────────────────────────────────────────────────────
+        const WORKER_URL = 'https://aibiz-kviz-handler.ai24q.workers.dev/';
+
         let currentStep = 0;
         const steps = document.querySelectorAll('.step');
         const progressBar = document.getElementById('progress');
@@ -241,8 +246,10 @@
             contactError.classList.add('hidden');
         });
 
-        // Обробка відправки форми
-        quizForm.addEventListener('submit', function(e) {
+        // ──────────────────────────────────────────────────────────────
+        // Обробка відправки форми — відправляємо на Cloudflare Worker
+        // ──────────────────────────────────────────────────────────────
+        quizForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const contactValue = contactInput.value.trim();
@@ -253,6 +260,8 @@
                 contactError.classList.remove('hidden');
                 return; 
             }
+            contactInput.classList.remove('input-error');
+            contactError.classList.add('hidden');
 
             // Збір даних
             const formData = new FormData(quizForm);
@@ -266,15 +275,34 @@
                 task: formData.get('task')
             };
 
-            console.log("Дані готові до відправки:", data);
+            // Індикатор завантаження
+            const submitBtn = quizForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Відправляємо...';
 
-            // Перемикання на фінальний екран
-            quizForm.classList.add('hidden');
-            // Ховаємо прогрес-бар і кнопку "Назад"
-            progressBar.parentElement.classList.add('hidden'); 
-            prevBtnWrapper.classList.add('hidden');
-            
-            finalScreen.classList.remove('hidden');
+            try {
+                const res = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (!result.ok) throw new Error(result.error || 'Помилка сервера');
+
+                // Успіх — показуємо фінальний екран
+                quizForm.classList.add('hidden');
+                progressBar.parentElement.classList.add('hidden');
+                prevBtnWrapper.classList.add('hidden');
+                finalScreen.classList.remove('hidden');
+
+            } catch (err) {
+                console.error('Submit error:', err);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                contactError.textContent = 'Помилка відправки. Спробуйте ще раз або напишіть напряму: @yura_kotovich';
+                contactError.classList.remove('hidden');
+            }
         });
     </script>
 </body>
