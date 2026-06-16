@@ -161,6 +161,12 @@
                         Отримати покроковий план
                     </button>
                 </div>
+
+                <!-- Honeypot: невидиме поле-пастка для ботів. Людина його не бачить і не заповнює -->
+                <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+                    <label for="website">Залиште це поле порожнім</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                </div>
             </div>
 
             <!-- КНОПКА НАЗАД (Тепер знизу) -->
@@ -176,7 +182,7 @@
         <div id="finalScreen" class="hidden text-center py-8">
             <div class="text-5xl mb-6">🎉</div>
             <h2 class="text-2xl font-bold mb-4 text-emerald-400">Дякую, заявку прийнято!</h2>
-            <p class="text-gray-300 mb-2 leading-relaxed">Я вже вивчаю ваші відповіді. Вартість індивідуального розбору вашого кейсу (созвон або текстове рішення з інструкціями) — <span class="text-white font-bold">500 грн/год</span>.</p>
+            <p class="text-gray-300 mb-2 leading-relaxed">Я вже вивчаю ваші відповіді. Вартість індивідуального розбору вашого кейсу (созвон або текстове рішення з інструкціями) — <span class="text-white font-bold"></span>.</p>
             <p class="text-gray-400 text-sm mt-4">Зв'яжуся з вами протягом 2 годин у вказаному месенджері або по email, щоб узгодити час сесії.</p>
         </div>
 
@@ -246,6 +252,13 @@
             contactError.classList.add('hidden');
         });
 
+        // Перевірка формату: валідний email АБО Telegram username (@name, мін. 5 символів)
+        function isValidContact(value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const tgRegex = /^@?[a-zA-Z0-9_]{5,32}$/;
+            return emailRegex.test(value) || tgRegex.test(value);
+        }
+
         // ──────────────────────────────────────────────────────────────
         // Обробка відправки форми — відправляємо на Cloudflare Worker
         // ──────────────────────────────────────────────────────────────
@@ -253,13 +266,33 @@
             e.preventDefault();
             
             const contactValue = contactInput.value.trim();
+            const honeypotValue = document.getElementById('website').value;
 
-            // Валідація обов'язкового поля
+            // Бот заповнив приховане поле — тихо ігноруємо, ніби все ОК
+            if (honeypotValue) {
+                quizForm.classList.add('hidden');
+                progressBar.parentElement.classList.add('hidden');
+                prevBtnWrapper.classList.add('hidden');
+                finalScreen.classList.remove('hidden');
+                return;
+            }
+
+            // Поле порожнє
             if (!contactValue) {
                 contactInput.classList.add('input-error');
+                contactError.textContent = 'Будь ласка, вкажіть контакт для зв\'язку';
                 contactError.classList.remove('hidden');
                 return; 
             }
+
+            // Поле заповнене, але формат не схожий на email чи Telegram username
+            if (!isValidContact(contactValue)) {
+                contactInput.classList.add('input-error');
+                contactError.textContent = 'Введіть коректний email (name@mail.com) або Telegram username (@username)';
+                contactError.classList.remove('hidden');
+                return;
+            }
+
             contactInput.classList.remove('input-error');
             contactError.classList.add('hidden');
 
