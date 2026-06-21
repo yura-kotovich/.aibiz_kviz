@@ -7,70 +7,50 @@
     <!-- Правильне підключення Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Базове сховання кроків */
-        .step { 
-            display: none; 
-        }
-        .step.active { 
-            display: block; 
-            animation: fadeIn 0.4s ease-in-out; /* Плавна анімація */
-        }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.4s ease-in-out; }
 
-        /* Анімація появи */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Стилізація вибраної картки (Radio) */
-        .option-card input:checked + span {
-            color: #06b6d4; /* text-cyan-500 */
-        }
+        .option-card input:checked + span { color: #06b6d4; }
         .option-card:has(input:checked) {
             border-color: #06b6d4 !important;
             background-color: #2a3a44 !important;
         }
 
-        /* Підсвітка помилки валідації */
-        .input-error {
-            border-color: #ef4444 !important;
-        }
+        .input-error { border-color: #ef4444 !important; }
 
-        /* AI typing cursor */
         .cursor {
             display: inline-block;
-            width: 8px;
+            width: 7px;
+            height: 14px;
             background: #06b6d4;
-            animation: blink 1s infinite;
             margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 1s step-start infinite;
         }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
+        @keyframes blink { 50% { opacity: 0; } }
 
-        /* Поява рядків логу AI-аналізу */
-        .ai-log-line {
+        .log-item {
             opacity: 0;
-            animation: logFadeIn 0.4s ease-in-out forwards;
+            transform: translateY(4px);
+            animation: logIn 0.35s ease forwards;
         }
-        @keyframes logFadeIn {
-            from { opacity: 0; transform: translateX(-6px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+        @keyframes logIn { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-[#121212] text-gray-100 font-sans flex items-center justify-center min-h-screen p-4">
 
     <div class="max-w-xl w-full bg-[#1e1e1e] p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-800 relative">
-        
-        <!-- Лінія прогресу (Progress Bar) -->
-        <div id="progressWrapper" class="w-full bg-gray-800 h-2 rounded-full mb-8 overflow-hidden">
+
+        <div class="w-full bg-gray-800 h-2 rounded-full mb-8 overflow-hidden">
             <div id="progress" class="bg-cyan-500 h-full w-[0%] transition-all duration-500 ease-out"></div>
         </div>
 
         <form id="quizForm" class="relative">
-            <!-- ЕКРАН 0: ВСТУП -->
             <div class="step active" data-progress="10">
                 <h1 class="text-2xl md:text-3xl font-bold mb-4 text-cyan-400">Персональний план впровадження ШІ під ваші задачі</h1>
                 <p class="text-gray-300 mb-6 leading-relaxed">
@@ -84,7 +64,6 @@
                 </button>
             </div>
 
-            <!-- ЕКРАН 1: НАПРЯМОК -->
             <div class="step" data-progress="25">
                 <h2 class="text-xl font-semibold mb-6">Який напрямок ШІ вас цікавить найбільше?</h2>
                 <div class="space-y-3">
@@ -111,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- ЕКРАН 2: ДОСВІД -->
             <div class="step" data-progress="50">
                 <h2 class="text-xl font-semibold mb-6">Який ваш поточний досвід роботи з нейромережами?</h2>
                 <div class="space-y-3">
@@ -134,7 +112,6 @@
                 </div>
             </div>
 
-            <!-- ЕКРАН 3: ФОРМАТ -->
             <div class="step" data-progress="75">
                 <h2 class="text-xl font-semibold mb-6">Який формат розбору вашого кейсу для вас найзручніший?</h2>
                 <div class="space-y-3">
@@ -149,7 +126,6 @@
                 </div>
             </div>
 
-            <!-- ЕКРАН 4: ОПИС ЗАВДАННЯ -->
             <div class="step" data-progress="90">
                 <h2 class="text-xl font-semibold mb-2">Опишіть ваше головне завдання або біль</h2>
                 <p class="text-xs text-gray-400 mb-4">💡 Опціонально. Приклад: «Хочу автоматизувати звітність», «Cursor заплутався в коді», «Шукаю промпт».</p>
@@ -159,11 +135,10 @@
                 </button>
             </div>
 
-            <!-- ЕКРАН 5: КОНТАКТИ -->
             <div class="step" data-progress="100">
                 <h2 class="text-xl font-semibold mb-2 text-cyan-400">Дяку! Матеріал для аналізу зібрано.</h2>
                 <p class="text-sm text-gray-400 mb-6">Куди надіслати ваш персональний план ШІ-рішення?</p>
-                
+
                 <div class="space-y-5">
                     <div>
                         <label class="block text-xs uppercase text-gray-400 mb-2 font-semibold">Ваше ім'я</label>
@@ -179,20 +154,18 @@
                         <input type="tel" id="clientPhone" placeholder="+380..." class="w-full p-3 bg-[#262626] border border-gray-700 rounded-xl focus:border-cyan-500 focus:outline-none text-gray-100 transition-colors">
                         <span class="text-[10px] text-gray-500">для зв'язку в Viber / WhatsApp</span>
                     </div>
-                    
+
                     <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-4 rounded-xl transition text-lg mt-2 cursor-pointer shadow-lg shadow-emerald-500/20">
                         Отримати покроковий план
                     </button>
                 </div>
 
-                <!-- Honeypot: невидиме поле-пастка для ботів. Людина його не бачить і не заповнює -->
                 <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
                     <label for="website">Залиште це поле порожнім</label>
                     <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                 </div>
             </div>
 
-            <!-- КНОПКА НАЗАД (Тепер знизу) -->
             <div id="prevBtnWrapper" class="hidden mt-8 text-center">
                 <button type="button" id="prevBtn" class="text-gray-500 hover:text-white text-sm transition-colors cursor-pointer hover:underline">
                     ← Назад
@@ -201,57 +174,51 @@
 
         </form>
 
-        <!-- ЕКРАН AI-АНАЛІЗУ (показується після відправки форми, перед фіналом) -->
-        <div id="aiScreen" class="hidden text-center py-6">
-            <h2 class="text-xl font-semibold mb-6 text-cyan-400">AI аналізує ваш запит<span class="cursor"></span></h2>
+        <div id="aiScreen" class="hidden text-center py-8">
+            <div class="text-5xl mb-6">🧠</div>
+            <h2 class="text-2xl font-bold mb-2 text-cyan-400">AI аналізує ваш запит</h2>
+            <p class="text-gray-400 text-sm mb-6">Це займе кілька секунд — формую персональні рекомендації</p>
 
             <div class="w-full bg-gray-800 h-2 rounded-full mb-6 overflow-hidden">
-                <div id="aiProgress" class="bg-cyan-500 h-full w-0 transition-all duration-300 ease-out"></div>
+                <div id="aiProgress" class="bg-cyan-500 h-full w-[0%] transition-all duration-300 ease-out"></div>
             </div>
 
-            <div id="aiLog" class="text-left text-sm text-gray-400 space-y-2 min-h-[140px]"></div>
+            <div id="aiLog" class="text-left text-sm text-gray-400 space-y-2 mb-4 min-h-[150px]"></div>
+
+            <p class="text-left text-cyan-300 text-sm font-mono min-h-[20px]">
+                <span id="aiTyping"></span><span class="cursor"></span>
+            </p>
         </div>
 
-        <!-- ЕКРАН 6: ФІНАЛ -->
         <div id="finalScreen" class="hidden text-center py-8">
             <div class="text-5xl mb-6">🎉</div>
             <h2 class="text-2xl font-bold mb-4 text-emerald-400">Дякую, заявку прийнято!</h2>
-            <p class="text-gray-300 mb-2 leading-relaxed">Я вже вивчаю ваші відповіді.</p>
-            <p class="text-gray-400 text-sm mt-4">Зв'яжуся з вами протягом 2 годин у вказаному месенджері або по email, щоб узгодити час сесії.</p>
+            <p class="text-gray-300 mb-2 leading-relaxed">Я вже сформував персональний план автоматизації під ваш запит — інструменти, сценарії та AI-архітектуру рішення.</p>
+            <p class="text-gray-400 text-sm mt-4">Зв'яжуся з вами протягом 2 годин у вказаному месенджері або по email, щоб узгодити деталі.</p>
         </div>
 
     </div>
 
-    <!-- JAVASCRIPT ЛОГІКА -->
     <script>
-        // ──────────────────────────────────────────────────────────────
-        // URL твого Cloudflare Worker
-        // ──────────────────────────────────────────────────────────────
         const WORKER_URL = 'https://aibiz-kviz-handler.ai24q.workers.dev/';
 
         let currentStep = 0;
         const steps = document.querySelectorAll('.step');
         const progressBar = document.getElementById('progress');
-        const progressWrapper = document.getElementById('progressWrapper');
         const prevBtnWrapper = document.getElementById('prevBtnWrapper');
         const prevBtn = document.getElementById('prevBtn');
+        const quizForm = document.getElementById('quizForm');
         const aiScreen = document.getElementById('aiScreen');
         const finalScreen = document.getElementById('finalScreen');
-        const quizForm = document.getElementById('quizForm');
         const contactInput = document.getElementById('clientContact');
         const contactError = document.getElementById('contactError');
 
-        // Оновлення вигляду форми при зміні кроку
         function updateForm() {
             steps.forEach((step, index) => {
                 step.classList.toggle('active', index === currentStep);
             });
-
-            // Оновлення прогрес-бару
             const progress = steps[currentStep].getAttribute('data-progress');
             progressBar.style.width = `${progress}%`;
-
-            // Показувати/ховати кнопку Назад
             if (currentStep > 0 && currentStep < steps.length) {
                 prevBtnWrapper.classList.remove('hidden');
             } else {
@@ -259,7 +226,6 @@
             }
         }
 
-        // Перехід далі
         function nextStep() {
             if (currentStep < steps.length - 1) {
                 currentStep++;
@@ -267,7 +233,6 @@
             }
         }
 
-        // Перехід назад
         prevBtn.addEventListener('click', () => {
             if (currentStep > 0) {
                 currentStep--;
@@ -275,99 +240,98 @@
             }
         });
 
-        // Автоперехід при виборі Radio-кнопки
         function autoNext() {
-            setTimeout(() => {
-                nextStep();
-            }, 400); 
+            setTimeout(() => { nextStep(); }, 400);
         }
 
-        // Прибрати помилку валідації при введенні тексту
         contactInput.addEventListener('input', () => {
             contactInput.classList.remove('input-error');
             contactError.classList.add('hidden');
         });
 
-        // Перевірка формату: валідний email АБО Telegram username (@name, мін. 5 символів)
         function isValidContact(value) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const tgRegex = /^@?[a-zA-Z0-9_]{5,32}$/;
             return emailRegex.test(value) || tgRegex.test(value);
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // AI "аналіз" — суто візуальна імітація обробки запиту.
-        // Запускається ПІСЛЯ успішної відправки даних на Worker,
-        // дані вже надіслані, це просто екран очікування перед фіналом.
-        // ──────────────────────────────────────────────────────────────
-        function runAIAnalysis(onComplete) {
-            const progressEl = document.getElementById('aiProgress');
-            const logEl = document.getElementById('aiLog');
-            logEl.innerHTML = '';
+        function runAIAnalysis(onDone) {
+            const bar = document.getElementById('aiProgress');
+            const log = document.getElementById('aiLog');
+            const typing = document.getElementById('aiTyping');
 
-            const stepsLog = [
-                "Аналізую ваші відповіді...",
-                "Визначаю напрямок задачі...",
-                "Підбираю релевантні AI-інструменти...",
-                "Оцінюю формат та складність кейсу...",
-                "Формую персональні рекомендації..."
+            log.innerHTML = '';
+            typing.textContent = '';
+            bar.style.width = '0%';
+
+            const logSteps = [
+                'Аналізую ваші відповіді...',
+                'Визначаю тип задачі та контекст...',
+                'Підбираю релевантні AI-інструменти...',
+                'Формую архітектуру рішення...',
+                'Готую персональний план дій...'
             ];
 
+            const finalLine = 'Готово. Передаю результат вашому консультанту →';
+
             let progress = 0;
-            let logIndex = 0;
+            let stepIndex = 0;
 
             const interval = setInterval(() => {
-                progress += Math.random() * 8 + 4;
-                if (progress > 100) progress = 100;
-                progressEl.style.width = progress + '%';
+                progress += Math.random() * 9 + 6;
+                bar.style.width = Math.min(progress, 100) + '%';
 
-                const triggerPoint = (logIndex + 1) * (100 / stepsLog.length);
-                if (logIndex < stepsLog.length && progress >= triggerPoint) {
-                    const line = document.createElement('div');
-                    line.className = 'ai-log-line';
-                    line.textContent = '✔ ' + stepsLog[logIndex];
-                    logEl.appendChild(line);
-                    logIndex++;
+                if (stepIndex < logSteps.length && progress > (stepIndex + 1) * (100 / logSteps.length) - 8) {
+                    const item = document.createElement('div');
+                    item.className = 'log-item flex items-center gap-2';
+                    item.innerHTML = '<span class="text-cyan-500">✔</span><span>' + logSteps[stepIndex] + '</span>';
+                    log.appendChild(item);
+                    stepIndex++;
                 }
 
                 if (progress >= 100) {
                     clearInterval(interval);
-                    setTimeout(onComplete, 600);
+                    bar.style.width = '100%';
+                    typeText(typing, finalLine, () => {
+                        setTimeout(onDone, 700);
+                    });
                 }
-            }, 220);
+            }, 280);
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // Обробка відправки форми — відправляємо на Cloudflare Worker
-        // ──────────────────────────────────────────────────────────────
+        function typeText(el, text, callback) {
+            let i = 0;
+            const t = setInterval(() => {
+                el.textContent += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(t);
+                    if (callback) callback();
+                }
+            }, 22);
+        }
+
         quizForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const contactValue = contactInput.value.trim();
             const honeypotValue = document.getElementById('website').value;
 
-            // Бот заповнив приховане поле — тихо ігноруємо, ніби все ОК
             if (honeypotValue) {
                 quizForm.classList.add('hidden');
-                progressWrapper.classList.add('hidden');
+                progressBar.parentElement.classList.add('hidden');
                 prevBtnWrapper.classList.add('hidden');
-                aiScreen.classList.remove('hidden');
-                runAIAnalysis(() => {
-                    aiScreen.classList.add('hidden');
-                    finalScreen.classList.remove('hidden');
-                });
+                finalScreen.classList.remove('hidden');
                 return;
             }
 
-            // Поле порожнє
             if (!contactValue) {
                 contactInput.classList.add('input-error');
-                contactError.textContent = 'Будь ласка, вкажіть контакт для зв\'язку';
+                contactError.textContent = "Будь ласка, вкажіть контакт для зв'язку";
                 contactError.classList.remove('hidden');
-                return; 
+                return;
             }
 
-            // Поле заповнене, але формат не схожий на email чи Telegram username
             if (!isValidContact(contactValue)) {
                 contactInput.classList.add('input-error');
                 contactError.textContent = 'Введіть коректний email (name@mail.com) або Telegram username (@username)';
@@ -378,7 +342,6 @@
             contactInput.classList.remove('input-error');
             contactError.classList.add('hidden');
 
-            // Збір даних
             const formData = new FormData(quizForm);
             const data = {
                 name: document.getElementById('clientName').value,
@@ -390,7 +353,6 @@
                 task: formData.get('task')
             };
 
-            // Індикатор завантаження
             const submitBtn = quizForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
@@ -405,9 +367,8 @@
                 const result = await res.json();
                 if (!result.ok) throw new Error(result.error || 'Помилка сервера');
 
-                // Успіх — спершу показуємо екран AI-аналізу, потім фінал
                 quizForm.classList.add('hidden');
-                progressWrapper.classList.add('hidden');
+                progressBar.parentElement.classList.add('hidden');
                 prevBtnWrapper.classList.add('hidden');
                 aiScreen.classList.remove('hidden');
 
